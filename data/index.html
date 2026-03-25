@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>ESP32 Car</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>ESP32 Car</h1>
+    <div id="status-bar">
+      <span id="ws-status" class="badge disconnected">Disconnected</span>
+      <span class="speed-label">Speed</span>
+      <div id="speed-bar-wrap">
+        <div id="speed-bar"></div>
+      </div>
+      <span id="speed-value">0</span>
+      <span class="rssi-label">Signal</span>
+      <div id="rssi-bars" class="rssi-bars">
+        <span class="rssi-bar" id="rssi-bar-1"></span>
+        <span class="rssi-bar" id="rssi-bar-2"></span>
+        <span class="rssi-bar" id="rssi-bar-3"></span>
+        <span class="rssi-bar" id="rssi-bar-4"></span>
+      </div>
+      <span id="rssi-value">-- dBm</span>
+      <span class="current-label">Current</span>
+      <div class="current-group">
+        <div class="current-row">
+          <span class="current-dir-label">FWD</span>
+          <div class="current-bar-wrap"><div id="current-fwd-bar" class="current-bar"></div></div>
+          <span id="current-fwd-value" class="current-value">0</span>
+        </div>
+        <div class="current-row">
+          <span class="current-dir-label">BWD</span>
+          <div class="current-bar-wrap"><div id="current-bwd-bar" class="current-bar"></div></div>
+          <span id="current-bwd-value" class="current-value">0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="controls-row">
+      <!-- Left panel: steer buttons -->
+      <div class="steer-group">
+        <button class="ctrl-btn" id="btn-left">&#9664;<br/><small>Left</small></button>
+        <button class="ctrl-btn" id="btn-right">&#9654;<br/><small>Right</small></button>
+      </div>
+
+      <!-- Right panel: drive joystick -->
+      <div class="joystick-container">
+        <span class="joy-label">FWD</span>
+        <div class="joystick-track" id="joystick-track">
+          <div class="joystick-knob" id="joystick-knob"></div>
+        </div>
+        <span class="joy-label">BWD</span>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
