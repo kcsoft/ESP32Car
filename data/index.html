@@ -8,39 +8,49 @@
 </head>
 <body>
   <header>
-    <h1>ESP32 Car</h1>
-    <div id="status-bar">
-      <span id="ws-status" class="badge disconnected">Disconnected</span>
-      <span class="speed-label">Speed</span>
-      <div id="speed-bar-wrap">
-        <div id="speed-bar"></div>
-      </div>
-      <span id="speed-value">0</span>
-      <span class="rssi-label">Signal</span>
-      <div id="rssi-bars" class="rssi-bars">
-        <span class="rssi-bar" id="rssi-bar-1"></span>
-        <span class="rssi-bar" id="rssi-bar-2"></span>
-        <span class="rssi-bar" id="rssi-bar-3"></span>
-        <span class="rssi-bar" id="rssi-bar-4"></span>
-      </div>
-      <span id="rssi-value">-- dBm</span>
-      <span class="current-label">Current</span>
-      <div class="current-group">
-        <div class="current-row">
-          <span class="current-dir-label">FWD</span>
-          <div class="current-bar-wrap"><div id="current-fwd-bar" class="current-bar"></div></div>
-          <span id="current-fwd-value" class="current-value">0</span>
+    <div class="header-row">
+      <h1>ESP32 Car</h1>
+      <div id="status-bar">
+        <span id="ws-status" class="badge disconnected">Disconnected</span>
+        <span class="speed-label">Speed</span>
+        <div id="speed-bar-wrap">
+          <div id="speed-bar"></div>
         </div>
-        <div class="current-row">
-          <span class="current-dir-label">BWD</span>
-          <div class="current-bar-wrap"><div id="current-bwd-bar" class="current-bar"></div></div>
-          <span id="current-bwd-value" class="current-value">0</span>
+        <span id="speed-value">0</span>
+        <span class="rssi-label">Signal</span>
+        <div id="rssi-bars" class="rssi-bars">
+          <span class="rssi-bar" id="rssi-bar-1"></span>
+          <span class="rssi-bar" id="rssi-bar-2"></span>
+          <span class="rssi-bar" id="rssi-bar-3"></span>
+          <span class="rssi-bar" id="rssi-bar-4"></span>
+        </div>
+        <span id="rssi-value">-- dBm</span>
+        <span class="current-label">Current</span>
+        <div class="current-group">
+          <div class="current-row">
+            <span class="current-dir-label">FWD</span>
+            <div class="current-bar-wrap"><div id="current-fwd-bar" class="current-bar"></div></div>
+            <span id="current-fwd-value" class="current-value">0</span>
+          </div>
+          <div class="current-row">
+            <span class="current-dir-label">BWD</span>
+            <div class="current-bar-wrap"><div id="current-bwd-bar" class="current-bar"></div></div>
+            <span id="current-bwd-value" class="current-value">0</span>
+          </div>
         </div>
       </div>
+    </div>
+    <div class="header-row header-row--block">
+      <span class="block-label">&#x1F512;</span>
+      <label class="toggle">
+        <input type="checkbox" id="block-switch" />
+        <span class="toggle-slider"></span>
+      </label>
     </div>
   </header>
 
   <main>
+    <div class="main-col">
     <div class="controls-row">
       <!-- Left panel: steer buttons -->
       <div class="steer-group">
@@ -56,6 +66,7 @@
         </div>
         <span class="joy-label">BWD</span>
       </div>
+    </div>
     </div>
   </main>
 

@@ -11,6 +11,9 @@
 #define PEDAL_PIN       36
 #define MOTOR_RIS_PIN   34   // BTS7960 R_IS — forward current sense (ADC1_CH6, input-only)
 #define MOTOR_LIS_PIN   35   // BTS7960 L_IS — backward current sense (ADC1_CH7, input-only)
+// ON/OFF PEDAL
+#define ONOFF_PEDAL_FW  14  // GPIO for on/off pedal
+#define ONOFF_PEDAL_BW  12  // GPIO for on/off pedal (backward)
 
 #define PWM_FREQ        20000
 #define PWM_RESOLUTION  8
@@ -22,8 +25,8 @@
 #define WS_WATCHDOG_MS  2000
 
 // ── Ramp-rate constants (PWM steps per loop tick, i.e. per 50 ms) ─────────────
-#define RAMP_STEP_FWD    5   // forward motor ramp speed
-#define RAMP_STEP_BWD    5   // backward motor ramp speed
+#define RAMP_STEP_FWD    2   // forward motor ramp speed
+#define RAMP_STEP_BWD    2   // backward motor ramp speed
 #define RAMP_STEP_STEER  10  // steering ramp speed (left & right)
 
 // ── Server & WebSocket ─────────────────────────────────────────
@@ -31,6 +34,7 @@ AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
 static unsigned long lastWsMsgMs = 0;  // 0 → watchdog fires until first client msg
+static bool isBlocked = false;         // true while pedal is suppressed (WS commanded fwd/bwd, or block switch on)
 
 // ── PWM target & current state ─────────────────────────────────
 static uint8_t targetFwd   = 0, currentFwd   = 0;
@@ -95,6 +99,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
     Serial.printf("[WS] Client #%u connected\n", client->id());
   } else if (type == WS_EVT_DISCONNECT) {
     Serial.printf("[WS] Client #%u disconnected\n", client->id());
+    isBlocked = false;
     stopMotor();
     steerStraight();
   } else if (type == WS_EVT_DATA) {
@@ -127,13 +132,20 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
         } else if (strcmp(cmd, "forward") == 0) {
           char *param = strtok_r(nullptr, " ", &innerSave);
           uint8_t speed = param ? (uint8_t)constrain(atoi(param), 0, 255) : 0;
+          isBlocked = true;
           setMotorForward(speed);
         } else if (strcmp(cmd, "backward") == 0) {
           char *param = strtok_r(nullptr, " ", &innerSave);
           uint8_t speed = param ? (uint8_t)constrain(atoi(param), 0, 255) : 0;
+          isBlocked = true;
           setMotorBackward(speed);
         } else if (strcmp(cmd, "stop") == 0) {
+          isBlocked = false;
           stopMotor();
+        } else if (strcmp(cmd, "block") == 0) {
+          char *param = strtok_r(nullptr, " ", &innerSave);
+          isBlocked = param ? (atoi(param) != 0) : false;
+          if (isBlocked) stopMotor();
         }
       }
       msg = strtok_r(nullptr, ";", &outerSave);
@@ -157,6 +169,10 @@ void setup() {
   // Ensure all outputs start at zero immediately (bypass ramp on boot)
   ledcWrite(PWM_CH_FWD, 0);   ledcWrite(PWM_CH_BWD, 0);
   ledcWrite(PWM_CH_LEFT, 0);  ledcWrite(PWM_CH_RIGHT, 0);
+
+  // ON/OFF pedal pins — pulled high; pedal ties to GND when pressed
+  pinMode(ONOFF_PEDAL_FW, INPUT_PULLUP);
+  pinMode(ONOFF_PEDAL_BW, INPUT_PULLUP);
 
   WiFiManager wm;
   // Uncomment to wipe saved credentials during development:
@@ -185,8 +201,43 @@ void setup() {
 
 void loop() {
   if (millis() - lastWsMsgMs > WS_WATCHDOG_MS) {
+    isBlocked = false;
     stopMotor();
     steerStraight();
+  }
+
+  // ON/OFF pedal with 5 ms debounce: 0 = not pressed, 1 = forward, 2 = backward
+  {
+    static uint8_t       rawPedal       = 0;
+    static uint8_t       debouncedPedal = 0;
+    static uint8_t       lastActedPedal = 0xFF;  // force action on first loop
+    static unsigned long lastChangeMs   = 0;
+
+    uint8_t curPedal = (digitalRead(ONOFF_PEDAL_FW) == LOW) ? 1 :
+                       (digitalRead(ONOFF_PEDAL_BW) == LOW) ? 2 : 0;
+
+    if (curPedal != rawPedal) {
+      rawPedal     = curPedal;
+      lastChangeMs = millis();
+    }
+
+    // 0 (released) is immediate; 1/2 (pressed) require 5 ms stable
+    if (curPedal == 0) {
+      debouncedPedal = 0;
+    } else if (millis() - lastChangeMs >= 5) {
+      debouncedPedal = rawPedal;
+    }
+
+    if (!isBlocked && debouncedPedal != lastActedPedal) {
+      lastActedPedal = debouncedPedal;
+      if (debouncedPedal == 1) {
+        setMotorForward(255);
+      } else if (debouncedPedal == 2) {
+        setMotorBackward(255);
+      } else {
+        stopMotor();
+      }
+    }
   }
 
   // Ramp all PWM channels toward their targets
@@ -212,5 +263,5 @@ void loop() {
                ";current_bwd " + String(lisCurrent));
   }
   ws.cleanupClients();
-  delay(10);
+  delay(5);
 }

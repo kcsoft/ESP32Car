@@ -59,3 +59,8 @@ The web interface is designed to be responsive and can be accessed from both des
 - oscilloscope on driver, see if 255 = 100% duty cycle
 - test DRV8871 for steering
 - show pedal on web interface for debugging
+
+- connect MCU power to 7 pin. Use 2 pins for on/off pedal.
+
+- OTA
+https://github.com/espressif/arduino-esp32/blob/2.0.17/libraries/ArduinoOTA/examples/BasicOTA/BasicOTA.ino#L23-L24

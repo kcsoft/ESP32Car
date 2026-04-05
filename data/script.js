@@ -177,6 +177,12 @@ track.addEventListener('pointermove', (e) => {
 track.addEventListener('pointerup',     releaseJoystick);
 track.addEventListener('pointercancel', releaseJoystick);
 
+// ── Block switch ────────────────────────────────────────────────
+const blockSwitch = document.getElementById('block-switch');
+blockSwitch.addEventListener('change', () => {
+  send('block ' + (blockSwitch.checked ? '1' : '0'));
+});
+
 // ── Keyboard shortcuts (desktop) ────────────────────────────────
 const keyHeld = new Set();
 

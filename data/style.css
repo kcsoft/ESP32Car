@@ -13,12 +13,27 @@ html, body {
 /* ── Header ── */
 header {
   background: #1a1d27;
-  padding: 12px 20px;
+  padding: 0 20px;
   border-bottom: 1px solid #2a2e3e;
+  display: flex;
+  flex-direction: column;
+}
+
+.header-row {
   display: flex;
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
+  padding: 10px 0;
+}
+
+.header-row + .header-row {
+  border-top: 1px solid #2a2e3e;
+}
+
+.header-row--block {
+  justify-content: flex-end;
+  padding: 6px 0;
 }
 
 header h1 {
@@ -169,6 +184,70 @@ main {
   align-items: center;
   height: calc(100vh - 60px);
   padding: 20px;
+}
+
+/* ── Main column ── */
+.main-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* ── Block row ── */
+.block-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #888;
+}
+
+/* ── Toggle switch ── */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #2a2e3e;
+  border: 1px solid #3a3e52;
+  border-radius: 28px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: 3px;
+  top: 3px;
+  background: #666;
+  border-radius: 50%;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.toggle input:checked + .toggle-slider {
+  background: #3a1a1a;
+  border-color: #e05555;
+}
+
+.toggle input:checked + .toggle-slider::before {
+  transform: translateX(24px);
+  background: #e05555;
 }
 
 /* ── Controls row ── */
